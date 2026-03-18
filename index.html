@@ -4,153 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zyqorath</title>
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            background-color: #131314; /* Gemini Dark Background */
-            color: #e3e3e3; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
-            height: 100vh;
-            box-sizing: border-box;
-            overflow: hidden;
+            background-color: #131314; color: #e3e3e3; 
+            margin: 0; display: flex; flex-direction: column; align-items: center;
+            height: 100vh; box-sizing: border-box; overflow: hidden;
         }
 
-        /* Top Header */
-        .header {
-            width: 100%;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-            background: #131314;
-            z-index: 10;
-        }
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 600;
-            background: linear-gradient(74deg, #4285f4 0, #9b72cb 9%, #d96570 20%, #d96570 24%, #9b72cb 35%, #4285f4 44%, #9b72cb 50%, #d96570 56%, #d96570 75%, #9b72cb 85%, #4285f4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-        }
+        /* Top Header & Export Button */
+        .header { width: 100%; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; background: #131314; z-index: 10; border-bottom: 1px solid #333639;}
+        .logo { font-size: 1.4rem; font-weight: 600; background: linear-gradient(74deg, #4285f4 0, #9b72cb 9%, #d96570 20%, #d96570 24%, #9b72cb 35%, #4285f4 44%, #9b72cb 50%, #d96570 56%, #d96570 75%, #9b72cb 85%, #4285f4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+        .export-btn { background: transparent; border: 1px solid #444746; color: #e3e3e3; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: 0.2s;}
+        .export-btn:hover { background: #282a2c; border-color: #a8c7fa;}
 
         /* Main Chat Area */
-        .chat-container { 
-            width: 100%; 
-            max-width: 800px; 
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px 20px 140px 20px; /* Extra padding at bottom for input bar */
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
-
-        /* Scrollbar */
+        .chat-container { width: 100%; max-width: 800px; flex: 1; overflow-y: auto; padding: 20px 20px 140px 20px; box-sizing: border-box; scroll-behavior: smooth; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #444746; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #5f6368; }
 
-        /* Message Layout */
         .message-row { display: flex; margin-bottom: 32px; width: 100%; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .user-row { justify-content: flex-end; }
         .ai-row { justify-content: flex-start; gap: 16px;}
 
-        /* User Bubble */
-        .user-msg { 
-            background-color: #282a2c; /* Gemini user gray */
-            color: #e3e3e3; 
-            padding: 12px 20px; 
-            border-radius: 24px; 
-            max-width: 75%; 
-            font-size: 1rem;
-            line-height: 1.5;
-        }
+        .user-msg { background-color: #282a2c; color: #e3e3e3; padding: 12px 20px; border-radius: 24px; max-width: 75%; font-size: 1rem; line-height: 1.5; }
+        .ai-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, #4285f4, #d96570); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; flex-shrink: 0; }
+        .ai-msg { background-color: transparent; max-width: 85%; font-size: 1rem; line-height: 1.7; color: #e3e3e3; }
 
-        /* AI Text (No Bubble) */
-        .ai-avatar {
-            width: 32px; height: 32px;
-            background: linear-gradient(135deg, #4285f4, #d96570);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 14px; flex-shrink: 0;
-        }
-        .ai-msg { 
-            background-color: transparent; 
-            max-width: 85%; 
-            font-size: 1rem;
-            line-height: 1.7;
-            color: #e3e3e3;
-        }
-
-        /* Markdown Styling */
+        /* Markdown & Code Styling */
         .ai-msg p { margin-top: 0; margin-bottom: 16px; }
-        .ai-msg p:last-child { margin-bottom: 0; }
         .ai-msg h3 { margin-top: 0; font-size: 1.2rem; font-weight: 500; color: #fff;}
         .ai-msg strong { color: #fff; font-weight: 600;}
-        .ai-msg pre { background-color: #1e1f20; padding: 16px; border-radius: 12px; overflow-x: auto; margin: 16px 0; border: 1px solid #333639;}
-        .ai-msg code { font-family: 'Courier New', Courier, monospace; color: #a8c7fa; background-color: #1e1f20; padding: 2px 6px; border-radius: 6px; }
-        .ai-msg ul { padding-left: 20px; margin-bottom: 16px;}
+        .ai-msg pre { margin: 16px 0; border-radius: 12px; border: 1px solid #333639; overflow: hidden;}
+        .ai-msg code { font-family: 'Courier New', Courier, monospace; font-size: 0.9rem;}
+        .ai-msg p code { color: #a8c7fa; background-color: #1e1f20; padding: 2px 6px; border-radius: 6px; }
         
         .node-badge { font-size: 0.75rem; color: #a8c7fa; margin-bottom: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;}
 
-        /* Floating Input Bar */
-        .input-wrapper {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 800px;
-            padding: 24px 20px;
-            box-sizing: border-box;
-            background: linear-gradient(180deg, rgba(19,19,20,0) 0%, rgba(19,19,20,0.9) 30%, rgba(19,19,20,1) 100%);
-        }
+        /* Input Area & File Attachment */
+        .input-wrapper { position: fixed; bottom: 0; width: 100%; max-width: 800px; padding: 24px 20px; box-sizing: border-box; background: linear-gradient(180deg, rgba(19,19,20,0) 0%, rgba(19,19,20,0.9) 30%, rgba(19,19,20,1) 100%); }
         
-        .input-box {
-            display: flex;
-            background-color: #1e1f20;
-            border-radius: 32px;
-            padding: 6px 6px 6px 20px;
-            align-items: center;
-            border: 1px solid #333639;
-            transition: 0.2s;
-        }
+        .file-indicator { display: none; color: #a8c7fa; font-size: 0.8rem; margin-bottom: 8px; margin-left: 20px;}
+        
+        .input-box { display: flex; background-color: #1e1f20; border-radius: 32px; padding: 6px 6px 6px 16px; align-items: center; border: 1px solid #333639; transition: 0.2s; }
         .input-box:focus-within { background-color: #282a2c; border-color: #444746; }
 
-        input[type="text"] { 
-            flex: 1; 
-            padding: 12px 0; 
-            border: none; 
-            background: transparent; 
-            color: #e3e3e3; 
-            outline: none; 
-            font-size: 1rem; 
-            font-family: inherit;
-        }
-        input[type="text"]::placeholder { color: #8e918f; }
+        .attach-btn { background: transparent; border: none; color: #8e918f; cursor: pointer; border-radius: 50%; width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; transition: 0.2s;}
+        .attach-btn:hover { background: #333639; color: #e3e3e3;}
 
-        .send-btn { 
-            width: 40px; height: 40px; 
-            border: none; 
-            border-radius: 50%; 
-            background-color: transparent; 
-            color: #a8c7fa; 
-            cursor: pointer; 
-            display: flex; justify-content: center; align-items: center;
-            transition: 0.2s; 
-        }
+        input[type="text"] { flex: 1; padding: 12px 10px; border: none; background: transparent; color: #e3e3e3; outline: none; font-size: 1rem; font-family: inherit; }
+        
+        .send-btn { width: 40px; height: 40px; border: none; border-radius: 50%; background-color: transparent; color: #a8c7fa; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
         .send-btn:hover { background-color: #333639; }
         .send-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
-        /* Typing Dots */
         .typing { display: flex; gap: 4px; padding: 8px 0; align-items: center; height: 16px;}
         .typing span { width: 6px; height: 6px; background-color: #a8c7fa; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
         .typing span:nth-child(1) { animation-delay: -0.32s; }
@@ -162,6 +80,7 @@
 
     <div class="header">
         <div class="logo">Zyqorath</div>
+        <button class="export-btn" onclick="exportNotes()">💾 Save Notes</button>
     </div>
 
     <div class="chat-container" id="chat-box">
@@ -169,14 +88,19 @@
             <div class="ai-avatar">✨</div>
             <div class="ai-msg">
                 <div class="node-badge">System Ready</div>
-                <p>Hello! I am Zyqorath. What are we working on today?</p>
+                <p>Hello! I am Zyqorath. I can now remember our conversation, format code, and read PDF files. What are we studying?</p>
             </div>
         </div>
     </div>
     
     <div class="input-wrapper">
+        <div class="file-indicator" id="file-indicator">📎 <span id="file-name"></span> attached</div>
         <div class="input-box">
-            <input type="text" id="user-input" placeholder="Enter a prompt here" onkeypress="handleEnter(event)" autocomplete="off">
+            <input type="file" id="file-upload" accept=".pdf" style="display:none" onchange="handleFileUpload()">
+            <button class="attach-btn" onclick="document.getElementById('file-upload').click()" title="Attach PDF">📎</button>
+            
+            <input type="text" id="user-input" placeholder="Ask a question or upload a PDF..." onkeypress="handleEnter(event)" autocomplete="off">
+            
             <button class="send-btn" onclick="sendMessage()">
                 <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
             </button>
@@ -185,27 +109,56 @@
 
     <script>
         // ⚠️ PASTE YOUR RENDER URL ON THE LINE BELOW (Keep the /ask)
-        const BACKEND_URL = "https://mindmesh-ai.onrender.com/ask"; 
+        const BACKEND_URL = "https://mindmesh-ai.onrender.com/ask";  
+        
+        // 🧠 MEMORY SYSTEM: Stores the conversation history
+        let conversationHistory = [];
+        let currentFile = null;
+
+        function handleFileUpload() {
+            const fileInput = document.getElementById('file-upload');
+            if (fileInput.files.length > 0) {
+                currentFile = fileInput.files[0];
+                document.getElementById('file-name').innerText = currentFile.name;
+                document.getElementById('file-indicator').style.display = 'block';
+            }
+        }
+
+        function exportNotes() {
+            if (conversationHistory.length === 0) return alert("You don't have any notes to save yet!");
+            let text = "Zyqorath Study Notes\n\n======================\n\n";
+            conversationHistory.forEach(msg => {
+                let role = msg.role === 'user' ? "You:" : "Zyqorath:";
+                text += `${role}\n${msg.content}\n\n`;
+            });
+            const blob = new Blob([text], { type: "text/plain" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "Zyqorath_Notes.txt";
+            a.click();
+        }
 
         async function sendMessage() {
             const inputField = document.getElementById("user-input");
             const chatBox = document.getElementById("chat-box");
             const message = inputField.value.trim();
 
-            if (!message) return;
+            if (!message && !currentFile) return;
 
-            // Add User Message
+            // 1. Show User Message
+            let displayMessage = message;
+            if (currentFile) displayMessage += ` <br><br><em>(📎 Attached: ${currentFile.name})</em>`;
+            
             chatBox.innerHTML += `
                 <div class="message-row user-row">
-                    <div class="user-msg">${message}</div>
+                    <div class="user-msg">${displayMessage}</div>
                 </div>`;
             inputField.value = "";
             window.scrollTo(0, document.body.scrollHeight);
             chatBox.scrollTop = chatBox.scrollHeight;
 
+            // 2. Add Thinking Animation
             const thinkingId = "thinking-" + Date.now();
-            
-            // Add AI Thinking Animation
             chatBox.innerHTML += `
                 <div class="message-row ai-row" id="row-${thinkingId}">
                     <div class="ai-avatar">✨</div>
@@ -216,26 +169,43 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
+                // 3. Prepare the FormData (Allows sending files + text)
+                const formData = new FormData();
+                formData.append("question", message || "Please summarize this document.");
+                formData.append("history", JSON.stringify(conversationHistory));
+                if (currentFile) formData.append("file", currentFile);
+
+                // 4. Send to Backend
                 const response = await fetch(BACKEND_URL, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        question: message,
-                        is_complex: message.length > 100 
-                    })
+                    body: formData // Notice we don't use JSON headers here because of the file
                 });
                 
                 const data = await response.json();
-                const formattedAnswer = marked.parse(data.answer);
                 
+                // 5. Format Answer with Markdown and Syntax Highlighting
+                const formattedAnswer = marked.parse(data.answer);
                 document.getElementById(thinkingId).innerHTML = `
                     <div class="node-badge">${data.node}</div>
                     ${formattedAnswer}
                 `;
+                
+                // Trigger the beautiful code colors
+                setTimeout(() => hljs.highlightAll(), 10); 
+
+                // 6. Update Memory array
+                conversationHistory.push({"role": "user", "content": message});
+                conversationHistory.push({"role": "assistant", "content": data.answer});
+
+                // Clear the attached file now that it's sent
+                currentFile = null;
+                document.getElementById('file-upload').value = "";
+                document.getElementById('file-indicator').style.display = 'none';
+
             } catch (error) {
                 document.getElementById(thinkingId).innerHTML = `
                     <div class="node-badge" style="color:#d96570;">⚠️ Connection Error</div>
-                    <p>Unable to reach the Zyqorath servers. Please ensure the backend is running.</p>
+                    <p>Unable to reach the Zyqorath servers.</p>
                 `;
             }
             chatBox.scrollTop = chatBox.scrollHeight;
