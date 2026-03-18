@@ -28,7 +28,7 @@ Your goal is explain concepts clearly and intelligently.
 gemini_api_key = os.environ.get("GEMINI_API_KEY")
 if gemini_api_key:
     genai.configure(api_key=gemini_api_key)
-    gemini_model = genai.GenerativeModel('gemini-2.0-flash')
+    gemini_model = genai.GenerativeModel('gemini-1.5-pro')
 # Setup Groq (Fast Node)
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
